@@ -138,14 +138,13 @@ bootObraPage('relatorios', ['staff', 'reports', 'warehouse', 'inventory'], async
     const d = st.def, out = $('#out');
     const title = '<div class="row" style="margin-bottom:8px"><div class="section-title" style="margin:0">' + esc(d.label) +
       (d.noPeriod ? '' : ' · ' + esc(fmtDate(st.p.from) + ' a ' + fmtDate(st.p.to))) + '</div></div>';
-    const exp = st.rows.length ? '<div class="btn-row" style="margin:0 0 12px"><button class="btn" id="x-csv">Exportar Excel (CSV)</button><button class="btn" id="x-copy">Copiar tabela</button><button class="btn" id="x-pdf">' + (isAppWebView() ? 'Guardar relatório (HTML)' : 'Guardar PDF / Imprimir') + '</button></div>' : '';
+    const exp = st.rows.length ? '<div class="btn-row" style="margin:0 0 12px"><button class="btn" id="x-csv">Exportar Excel (CSV)</button><button class="btn" id="x-pdf">Guardar PDF / Imprimir</button></div>' : '';
     out.innerHTML = title + exp + (st.rows.length ? (d.kind === 'rpc' ? d.render(st.rows) : st.rows.map(d.item).join('')) : '<div class="empty">Sem registos para este período.</div>') +
       (st.more ? '<button class="btn btn-block" id="r-more">Carregar mais</button>' : '');
     const bm = $('#r-more');
     if (bm) bm.addEventListener('click', async () => { bm.disabled = true; try { await loadPage(); draw(); } catch (e) { toast(errMsg(e), 'error'); bm.disabled = false; } });
     const xc = $('#x-csv'); if (xc) xc.addEventListener('click', exportCSV);
     const xp = $('#x-pdf'); if (xp) xp.addEventListener('click', exportPDF);
-    const xk = $('#x-copy'); if (xk) xk.addEventListener('click', exportCopy);
   }
 
   async function generate() {
@@ -191,21 +190,10 @@ bootObraPage('relatorios', ['staff', 'reports', 'warehouse', 'inventory'], async
     b.disabled = false;
   }
 
-  async function exportCopy() {
-    const b = $('#x-copy'); b.disabled = true;
-    try { await copyTable(st.def.head, (await getAll()).map(st.def.row)); } catch (e) { toast(errMsg(e), 'error'); }
-    b.disabled = false;
-  }
-
   async function exportPDF() {
     const b = $('#x-pdf'); b.disabled = true;
     try {
       const rows = (await getAll()).map(st.def.row);
-      if (isAppWebView()) {   // a app não imprime: guarda um relatório HTML (abre e imprime no navegador)
-        const sub = ctx.membership.obra_name + (st.def.noPeriod ? '' : ' · ' + fmtDate(st.p.from) + ' a ' + fmtDate(st.p.to)) + ' · Emitido em ' + fmtDate(todayISO()) + ' por ' + ctx.full_name;
-        saveTextFile('donac_' + $('#r-type').value + '_' + (st.def.noPeriod ? todayISO() : st.p.from + '_' + st.p.to) + '.html', reportHtml('DONAC · ' + st.def.label, sub, st.def.head, rows), 'text/html;charset=utf-8');
-        b.disabled = false; return;
-      }
       printArea.innerHTML = '<h1>DONAC · ' + esc(st.def.label) + '</h1><p>' + esc(ctx.membership.obra_name) +
         (st.def.noPeriod ? '' : ' · ' + esc(fmtDate(st.p.from) + ' a ' + fmtDate(st.p.to))) + ' · Emitido em ' + esc(fmtDate(todayISO())) + ' por ' + esc(ctx.full_name) + '</p>' +
         '<table><thead><tr>' + st.def.head.map(h => '<th>' + esc(h) + '</th>').join('') + '</tr></thead><tbody>' +
