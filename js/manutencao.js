@@ -145,11 +145,7 @@ async function backup() {
       }
       out.tables[t] = all;
     }
-    const blob = new Blob([JSON.stringify(out)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = 'donac_copia_' + todayISO() + '.json';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+    saveTextFile('donac_copia_' + todayISO() + '.json', JSON.stringify(out), 'application/json');
     msg.className = 'alert alert-ok';
     msg.textContent = 'Cópia concluída: ' + BACKUP_TABLES.map(t => t + ' ' + out.tables[t].length).join(' · ');
   } catch (e) { msg.className = 'alert alert-error'; msg.textContent = errMsg(e); }
