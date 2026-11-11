@@ -51,7 +51,7 @@ async function loadUsage() {
     box.className = '';
     box.innerHTML = '<div class="card"><div class="kv" style="border:0"><span>Total usado</span><span><b>' + esc(fmtBytes(data.db_bytes)) +
       '</b> de ' + PLAN_LIMIT_MB + ' MB (' + pct.toFixed(1).replace('.', ',') + '%)</span></div>' +
-      '<div style="height:10px;background:#eef1f5;border-radius:6px;overflow:hidden;margin:6px 0 12px"><div style="height:100%;width:' + pct + '%;background:' + color + '"></div></div>' +
+      '<div style="height:10px;background:#eef1f5;border-radius:6px;overflow:hidden;margin:6px 0 12px"><div class="bar-fill" style="height:100%;width:' + pct + '%;background:' + color + '"></div></div>' +
       data.tables.map(t => '<div class="kv"><span>' + esc(t.name) + '</span><span>' + esc(fmtNum(t.rows)) + ' registos · ' + esc(fmtBytes(t.bytes)) + '</span></div>').join('') +
       '<p class="hint" style="margin-bottom:0">O total inclui o sistema do Supabase, por isso é maior que a soma das tabelas. Confirme o limite do seu plano no painel do Supabase.</p></div>';
   } catch (e) { box.className = ''; box.innerHTML = '<div class="alert alert-error">' + esc(errMsg(e)) + '</div>'; }
@@ -145,11 +145,7 @@ async function backup() {
       }
       out.tables[t] = all;
     }
-    const blob = new Blob([JSON.stringify(out)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = 'donac_copia_' + todayISO() + '.json';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+    saveTextFile('donac_copia_' + todayISO() + '.json', JSON.stringify(out), 'application/json');
     msg.className = 'alert alert-ok';
     msg.textContent = 'Cópia concluída: ' + BACKUP_TABLES.map(t => t + ' ' + out.tables[t].length).join(' · ');
   } catch (e) { msg.className = 'alert alert-error'; msg.textContent = errMsg(e); }
