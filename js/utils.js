@@ -126,13 +126,56 @@ function csvCell(v) {
   if (/^[=+@]/.test(s) || /^-[^0-9.,\s]/.test(s)) s = "'" + s;   // evita fórmulas no Excel
   return '"' + s.replace(/"/g, '""') + '"';
 }
-function downloadCSV(filename, head, rows) {
-  const body = [head].concat(rows).map(r => r.map(csvCell).join(';')).join('\r\n');
-  const blob = new Blob(['\ufeff' + body], { type: 'text/csv;charset=utf-8' });
+// Guardar ficheiros: no navegador descarrega normalmente; dentro da app Kodular (WebViewer não
+// suporta blob nem impressão) envia o conteúdo à app através de WebViewString.
+function inKodular() { return !!(window.AppInventor && typeof window.AppInventor.setWebViewString === 'function'); }
+function isAppWebView() { return inKodular() || /; wv\)/.test(navigator.userAgent); }
+
+function saveTextFile(filename, content, mime) {
+  if (inKodular()) {
+    window.AppInventor.setWebViewString('DONAC_FILE|' + filename + '\n' + content);
+    toast('Ficheiro enviado à aplicação: ' + filename);
+    return;
+  }
+  const blob = new Blob([content], { type: mime || 'text/plain;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = filename;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+function downloadCSV(filename, head, rows) {
+  const body = [head].concat(rows).map(r => r.map(csvCell).join(';')).join('\r\n');
+  saveTextFile(filename, '\ufeff' + body, 'text/csv;charset=utf-8');
+}
+
+async function copyText(text) {
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; } } catch (e) { /* tenta o método antigo */ }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    const ok = document.execCommand('copy'); ta.remove(); return ok;
+  } catch (e) { return false; }
+}
+
+async function copyTable(head, rows) {
+  const tsv = [head].concat(rows).map(r => r.map(c => String(c === null || c === undefined ? '' : c).replace(/[\t\r\n]+/g, ' ')).join('\t')).join('\n');
+  const ok = await copyText(tsv);
+  toast(ok ? 'Copiado. Cole no WhatsApp, Notas ou Excel.' : 'Não foi possível copiar.', ok ? undefined : 'error');
+}
+
+// Documento HTML autónomo do relatório (abre em qualquer navegador e imprime/guarda como PDF)
+function reportHtml(title, subtitle, head, rows) {
+  const e = esc;
+  return '<!DOCTYPE html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>' + e(title) + '</title><style>body{font-family:Arial,sans-serif;margin:16px;color:#111}h1{font-size:18px;margin:0 0 4px;color:#0b2a4a}' +
+    'p{font-size:12px;margin:0 0 12px;color:#444}.w{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:12px}' +
+    'th,td{border:1px solid #999;padding:4px 6px;text-align:left}th{background:#e8edf3}button{margin-bottom:12px;padding:10px 16px;font-size:15px}' +
+    '@media print{button{display:none}}</style></head><body><button onclick="window.print()">Imprimir / Guardar como PDF</button>' +
+    '<h1>' + e(title) + '</h1><p>' + e(subtitle) + '</p><div class="w"><table><thead><tr>' + head.map(h => '<th>' + e(h) + '</th>').join('') +
+    '</tr></thead><tbody>' + rows.map(r => '<tr>' + r.map(c => '<td>' + e(typeof c === 'number' ? fmtNum(c) : c) + '</td>').join('') + '</tr>').join('') +
+    '</tbody></table></div></body></html>';
 }
 
 // ---- Ajustes: chamada à Edge Function (partilhada) ----
@@ -147,4 +190,21 @@ async function callAdmin(body) {
   // Só é sucesso se a função confirmar. Evita falsos sucessos (ex.: função com código errado).
   if (!data || data.ok !== true) throw new Error('Resposta inesperada da função admin-users. Verifique se o código publicado é o do ficheiro admin-users_index.ts.');
   return data;
+}
+
+// ---- Animações: números que contam até ao valor (respeita 'reduzir movimento') ----
+function runCountUps(root) {
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  (root || document).querySelectorAll('[data-count]').forEach(el => {
+    const to = Number(el.dataset.count);
+    if (!Number.isFinite(to)) return;
+    if (reduce || to === 0) { el.textContent = fmtNum(to); return; }
+    const t0 = performance.now(), dur = 700;
+    const step = t => {
+      const p = Math.min(1, (t - t0) / dur);
+      el.textContent = fmtNum(Math.round(to * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
 }
