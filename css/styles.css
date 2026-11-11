@@ -134,3 +134,82 @@ a.card:active{background:#f0f4f8}
   #print-area th{background:#e8edf3}
   @page{margin:12mm}
 }
+
+/* =====================  ANIMAÇÕES  ===================== */
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes slidedown{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:none}}
+@keyframes sheet{from{transform:translateY(100%)}to{transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes toastin{from{opacity:0;transform:translate(-50%,14px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes toastout{to{opacity:0;transform:translate(-50%,14px)}}
+@keyframes shakex{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+@keyframes bgmove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-40px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,30px)}}
+@keyframes logoin{from{opacity:0;transform:scale(.5) rotate(-8deg)}to{opacity:1;transform:none}}
+@keyframes shelf{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(11,42,74,.25)}50%{box-shadow:0 0 0 8px rgba(11,42,74,0)}}
+
+/* Carregamento: círculo a rodar em vez de texto parado */
+.loading::before{content:'';display:block;width:28px;height:28px;margin:0 auto 10px;border:3px solid var(--line);
+border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite}
+.spin{display:inline-block;width:14px;height:14px;margin-right:6px;vertical-align:-2px;border:2px solid rgba(255,255,255,.4);
+border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+
+/* Estrutura */
+.topbar{animation:slidedown .35s ease both}
+main{animation:fade .3s ease both}
+.page>h1,.page>.row,.page>.sub,.page>.section-title{animation:rise .4s ease both}
+.grid>.card{animation:rise .4s ease both}
+.grid>.card:nth-child(1){animation-delay:.03s}.grid>.card:nth-child(2){animation-delay:.08s}
+.grid>.card:nth-child(3){animation-delay:.13s}.grid>.card:nth-child(4){animation-delay:.18s}
+.grid>.card:nth-child(5){animation-delay:.23s}.grid>.card:nth-child(6){animation-delay:.28s}
+#list>.item,#out .item{animation:rise .3s ease both}
+#list>.item:nth-child(2),#out .item:nth-child(2){animation-delay:.04s}
+#list>.item:nth-child(3),#out .item:nth-child(3){animation-delay:.08s}
+#list>.item:nth-child(4),#out .item:nth-child(4){animation-delay:.12s}
+#list>.item:nth-child(5),#out .item:nth-child(5){animation-delay:.16s}
+#list>.item:nth-child(n+6),#out .item:nth-child(n+6){animation-delay:.2s}
+
+/* Toques e transições */
+.btn,.item,a.card,.nav a{transition:transform .15s ease,background-color .2s ease,color .2s ease,box-shadow .2s ease}
+.btn:active,.item:active,a.card:active{transform:scale(.97)}
+.btn-primary:not(:disabled){box-shadow:0 2px 6px rgba(11,42,74,.25)}
+.nav a .icon{transition:transform .25s cubic-bezier(.2,.9,.3,1.3)}
+.nav a.active .icon{transform:translateY(-2px) scale(1.12)}
+.field input,.field select,.field textarea,.inp{transition:border-color .2s ease,box-shadow .2s ease}
+.field input:focus,.field select:focus,.field textarea:focus,.inp:focus{box-shadow:0 0 0 3px rgba(20,61,105,.15)}
+.badge{animation:pop .3s ease both}
+.alert{animation:rise .3s ease both}
+.alert-error{animation:rise .3s ease both,shakex .4s .1s ease}
+.bar-fill{transform-origin:left;animation:grow .9s cubic-bezier(.2,.8,.2,1) both}
+
+/* Janelas e avisos */
+.modal-back{animation:fade .2s ease both}
+.modal{animation:sheet .3s cubic-bezier(.2,.85,.25,1) both}
+@media(min-width:700px){.modal{animation:pop .25s ease both}}
+.toast{animation:toastin .3s ease both,toastout .3s ease 3.2s forwards}
+
+/* Login */
+.auth-wrap{position:relative;overflow:hidden;background:linear-gradient(135deg,#0b2a4a,#143d69,#0e3356,#0b2a4a);
+background-size:300% 300%;animation:bgmove 14s ease infinite}
+.auth-wrap::before,.auth-wrap::after{content:'';position:absolute;border-radius:50%;background:rgba(127,178,229,.14);pointer-events:none}
+.auth-wrap::before{width:260px;height:260px;top:-70px;left:-80px;animation:float1 11s ease-in-out infinite}
+.auth-wrap::after{width:320px;height:320px;bottom:-110px;right:-90px;animation:float2 13s ease-in-out infinite}
+.auth-card{position:relative;z-index:1;animation:rise .6s cubic-bezier(.2,.8,.2,1) both;box-shadow:0 18px 40px rgba(0,0,0,.28)}
+.auth-card.shake{animation:shakex .45s ease}
+.auth-logo .name,.auth-logo .tag-line{animation:rise .5s .45s ease both}
+.logo-anim{animation:logoin .7s cubic-bezier(.2,.9,.3,1.2) both}
+.logo-d{animation:fade .6s .15s ease both}
+.shelf{transform-box:fill-box;transform-origin:left center;animation:shelf .45s ease both}
+.shelf.s1{animation-delay:.55s}.shelf.s2{animation-delay:.7s}.shelf.s3{animation-delay:.85s}
+.auth-card .btn-primary:not(:disabled){animation:pulse 2.6s 1.2s ease-in-out infinite}
+
+/* Quem prefere menos movimento (definição do telemóvel) não vê animações */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;
+  animation-delay:0s !important;transition-duration:.01ms !important}
+}
