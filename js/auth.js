@@ -62,7 +62,7 @@ async function initLoginPage() {
   $('#login-form').addEventListener('submit', async ev => {
     ev.preventDefault();
     box.className = ''; box.textContent = '';
-    btn.disabled = true; btn.textContent = 'A entrar...';
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span> A entrar...';
     try {
       const { error } = await db.auth.signInWithPassword({
         email: $('#email').value.trim(), password: $('#password').value
@@ -74,6 +74,7 @@ async function initLoginPage() {
     } catch (e) {
       box.className = 'alert alert-error';
       box.textContent = 'Email ou palavra-passe incorrectos.';
+      const card = $('.auth-card'); card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
       btn.disabled = false; btn.textContent = 'Entrar';
     }
   });
