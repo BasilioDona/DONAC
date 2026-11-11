@@ -20,7 +20,7 @@
     $('#btn-refresh').addEventListener('click', load);
 
     const card = (n, label, cls, href) => (href ? '<a class="card stat ' : '<div class="card stat ') + (cls || '') + '"' + (href ? ' href="' + href + '"' : '') + '>' +
-      '<div class="n">' + esc(n) + '</div><div class="l">' + esc(label) + '</div>' + (href ? '</a>' : '</div>');
+      '<div class="n" data-count="' + esc(n) + '">' + esc(n) + '</div><div class="l">' + esc(label) + '</div>' + (href ? '</a>' : '</div>');
     const moves = (list, sign) => list.length ? list.map(x => '<div class="kv"><span>' + esc(x.name) + '</span><span>' + sign +
       esc(fmtNum(x.quantity) + ' ' + x.unit) + ' · ' + esc(fmtDate(x.movement_date)) + '</span></div>').join('')
       : '<div class="s" style="color:var(--muted)">Sem registos.</div>';
@@ -50,7 +50,7 @@
             card(s.pending_absences, 'Faltas por justificar', s.pending_absences > 0 ? 'warn' : '', can(ctx, 'staff') ? 'faltas.html' : '') +
             card(s.late_today, 'Atrasos hoje', '', '') + '</div>';
         }
-        box.className = ''; box.innerHTML = h;
+        box.className = ''; box.innerHTML = h; runCountUps(box);
       } catch (e) {
         box.className = ''; box.innerHTML = '<div class="alert alert-error">' + esc(errMsg(e)) + '</div>';
       }
