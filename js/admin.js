@@ -13,7 +13,7 @@
 })();
 
 function statCard(n, label, cls) {
-  return '<div class="card stat ' + (cls || '') + '"><div class="n">' + esc(n) + '</div><div class="l">' + esc(label) + '</div></div>';
+  return '<div class="card stat ' + (cls || '') + '"><div class="n" data-count="' + esc(n) + '">' + esc(n) + '</div><div class="l">' + esc(label) + '</div></div>';
 }
 
 async function loadStats() {
@@ -29,6 +29,7 @@ async function loadStats() {
       statCard(data.users.total, 'Utilizadores') +
       statCard(data.users.ativos, 'Utilizadores activos', 'ok') +
       statCard(data.users.desactivados, 'Utilizadores desactivados', data.users.desactivados > 0 ? 'bad' : '');
+    runCountUps(box);
   } catch (e) {
     box.className = '';
     box.innerHTML = '<div class="alert alert-error">Não foi possível carregar os indicadores.</div>';
