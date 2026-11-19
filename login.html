@@ -27,7 +27,8 @@
       <div class="field"><label for="email">Email</label>
         <input id="email" type="email" autocomplete="username" required></div>
       <div class="field"><label for="password">Palavra-passe</label>
-        <input id="password" type="password" autocomplete="current-password" required></div>
+        <div class="pw-wrap"><input id="password" type="password" autocomplete="current-password" required>
+          <button class="pw-toggle" id="pw-toggle" type="button" aria-label="Mostrar palavra-passe" aria-pressed="false"></button></div></div>
       <button class="btn btn-primary btn-block" id="btn-login" type="submit">Entrar</button>
     </form>
   </div>
@@ -37,5 +38,27 @@
 <script src="js/utils.js"></script>
 <script src="js/auth.js"></script>
 <script>initLoginPage();</script>
+<script>
+(function () {
+  var inp = document.getElementById('password'), btn = document.getElementById('pw-toggle');
+  var EYE = '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>';
+  var ICON = function (extra) { return '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">' + EYE + (extra || '') + '</svg>'; };
+  function setShow(show) {
+    var a = inp.selectionStart, b = inp.selectionEnd;
+    inp.type = show ? 'text' : 'password';
+    btn.innerHTML = show ? ICON('<path d="M4 4l16 16"/>') : ICON();
+    btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+    btn.setAttribute('aria-label', show ? 'Ocultar palavra-passe' : 'Mostrar palavra-passe');
+    try { inp.setSelectionRange(a, b); } catch (e) {}
+  }
+  setShow(false);
+  // não tira o foco do campo ao tocar no botão (o teclado fica aberto)
+  btn.addEventListener('mousedown', function (e) { e.preventDefault(); });
+  btn.addEventListener('touchstart', function (e) { e.preventDefault(); btn.click(); }, { passive: false });
+  btn.addEventListener('click', function () { setShow(inp.type === 'password'); inp.focus(); });
+  // por segurança, volta a ocultar se a app/página sair do ecrã
+  document.addEventListener('visibilitychange', function () { if (document.hidden && inp.type === 'text') setShow(false); });
+})();
+</script>
 </body>
 </html>
