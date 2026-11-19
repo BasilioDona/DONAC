@@ -213,3 +213,13 @@ background-size:300% 300%;animation:bgmove 14s ease infinite}
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;
   animation-delay:0s !important;transition-duration:.01ms !important}
 }
+
+/* Campo de palavra-passe com botão mostrar/ocultar */
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:52px}
+.pw-toggle{position:absolute;right:3px;top:50%;transform:translateY(-50%);width:44px;height:44px;border:0;background:transparent;
+color:var(--muted);display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;
+-webkit-tap-highlight-color:transparent;transition:color .2s ease,background-color .2s ease}
+.pw-toggle:active{background:#eef3f9}
+.pw-toggle[aria-pressed="true"]{color:var(--navy)}
+.pw-toggle .icon{animation:pop .22s ease both}
